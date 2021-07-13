@@ -13,7 +13,7 @@ function ProfileSideBar(propriedades) {
   </Box>
   )
 }
-
+ 
 export default function Home() {
   const githubUser = `regisncoelho`;
   const devsFavoritas = [
@@ -22,10 +22,20 @@ export default function Home() {
     'peas',
     'rafaballerini',
     'marcobrunodev',
-    // 'Dadarkp3',
+    'Dadarkp3',
     'jeniblodev',
-    // 'robertaarcoverde',
+    'robertaarcoverde',
     ]
+    
+    
+    // fetch ('https://api.github.com/users/regisncoelho/following')
+    // .then(function(respostaDoServidor) {
+    //   return respostaDoServidor.json()
+    // })
+    // .then(function(respostaConvertida){
+    //   var following = respostaConvertida
+    //   console.log(following[0].login)
+    // })
 
   return (
   <>

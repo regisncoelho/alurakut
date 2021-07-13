@@ -20,6 +20,10 @@ padding: 16px;
     "profileArea welcomeArea profileRelationsArea";
   grid-template-columns: 160px 1fr 312px;
 }
+
+.profileRelarionsArea > div {
+  overflow: hidden
+}
 `;
 
 export default MainGrid;
