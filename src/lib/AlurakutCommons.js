@@ -20,6 +20,7 @@ function Link({ href, children, ...props }) {
 // Menu
 // ================================================================================================================
 export function AlurakutMenu({ githubUser }) {
+  var githubUser = `regisncoelho`;
   const [isMenuOpen, setMenuState] = React.useState(false);
   return (
     <AlurakutMenu.Wrapper isMenuOpen={isMenuOpen}>
