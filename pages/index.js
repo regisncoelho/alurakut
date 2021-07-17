@@ -1,4 +1,3 @@
-// import styled from 'styled-components'
 import React from 'react'
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
@@ -23,34 +22,59 @@ function ProfileSideBar(propriedades) {
   </Box>
   )
 }
- 
+
+function ProfileRelationsBox (propriedades){
+  return (
+  <ProfileRelationsBoxWrapper>
+    <h2 className="smallTitle">
+    {propriedades.title} ({propriedades.items.length})
+    </h2>
+    <ul>
+      {propriedades.items.map((itemAtual) =>{
+        const [usersfollowing, setUsersFollowing] = React.useState([])
+        React.useEffect(function (){
+          propriedades.items.map (() => {
+            fetch(`https://api.github.com/users/${
+              itemAtual.login}`)
+            .then(response => response.json())
+            .then(data => setUsersFollowing(data));
+          })
+
+        }, [])
+        return (
+          <li key={itemAtual.id}>
+            <a href={itemAtual.html_url} key={itemAtual.id} target="_blank">
+              <img src={itemAtual.avatar_url} />
+            <span> {usersfollowing.name} </span>
+            </a>
+          </li>
+        )
+      })}
+    </ul>
+  </ProfileRelationsBoxWrapper>
+  )
+}
+
 export default function Home() {
   const [comunidades, setComunidades] = React.useState([{
     id: '0',
-    title: 'Eu odeio segunda-feira',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
+    name: 'Eu odeio segunda-feira',
+    avatar_url: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
+    html_url: './community.html'
   }]);
   const githubUser = `regisncoelho`;
-  const devsFavoritas = [
-    'juunegreiros',
-    'omariosouto',
-    'peas',
-    'rafaballerini',
-    'marcobrunodev',
-    'Dadarkp3',
-    'jeniblodev',
-    'robertaarcoverde',
-    ]
     
     
-    // fetch ('https://api.github.com/users/regisncoelho/following')
-    // .then(function(respostaDoServidor) {
-    //   return respostaDoServidor.json()
-    // })
-    // .then(function(respostaConvertida){
-    //   var following = respostaConvertida
-    //   console.log(following[0].login)
-    // })
+const [following, setFollowing] = React.useState([])    
+React.useEffect(function () {
+    fetch ('https://api.github.com/users/regisncoelho/following')
+    .then(function(respostaDoServidor) {
+        return respostaDoServidor.json()
+      })
+    .then(function(respostaConvertida){
+        setFollowing(respostaConvertida);
+      })
+}, [])
 
   return (
   <>
@@ -107,42 +131,10 @@ export default function Home() {
         </Box>
       </div>
       <div className= "profileRelationsArea"  style={{gridAreas: 'profileRelationsArea'}}>
-        <ProfileRelationsBoxWrapper>
-          <h2 className="smallTitle">
-          Devs que eu curto ({devsFavoritas.length})
-          </h2>
-          <ul>
-          {devsFavoritas.map((itemAtual) =>{
-            return (
-            <li key={itemAtual}>
-            <a href={`/users/${itemAtual}`} key={itemAtual}>
-              <img src={`https://github.com/${itemAtual}.png`} />
-              <span> {itemAtual} </span>
-            </a>
-            </li>
-            )
-          })
-          }
-        </ul>
-        </ProfileRelationsBoxWrapper>
-        <ProfileRelationsBoxWrapper>
-          <h2 className="smallTitle">
-          Comunidades ({comunidades.length})
-          </h2>
-          <ul>
-            {comunidades.map((itemAtual) =>{
-              return (
-                <li key={itemAtual.id}>
-                  <a href={`/users/${itemAtual.title}`} key={itemAtual.title}>
-                    <img src={itemAtual.image} />
-                    <span> {itemAtual.title} </span>
-                  </a>
-                </li>
-               )
-              })
-            }
-          </ul>
-        </ProfileRelationsBoxWrapper>
+        <ProfileRelationsBox title="Devs que eu curto" items={following} 
+        // variable={userfollowing} 
+        />
+        <ProfileRelationsBox title="Comunidades" items={comunidades}/>
       </div>
 
     </MainGrid>
