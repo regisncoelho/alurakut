@@ -45,6 +45,7 @@ function ProfileRelationsBox (propriedades){
           <li key={itemAtual.id}>
             <a href={itemAtual.html_url} key={itemAtual.id} target="_blank">
               <img src={itemAtual.avatar_url} />
+            <span> {itemAtual.name} </span>
             <span> {usersfollowing.name} </span>
             </a>
           </li>
