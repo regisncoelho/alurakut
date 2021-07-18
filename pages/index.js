@@ -30,20 +30,18 @@ export default function Home() {
   const [usersfollowing, setUsersFollowing] = React.useState([])
 
   React.useEffect(function () {
-    following.map((itemAtual) => {
-      fetch(`https://api.github.com/users/${itemAtual.login}`)
-        .then(response => response.json())
-        .then(data => setUsersFollowing(data));
-    })
-  }, [])
-
-  React.useEffect(function () {
     fetch('https://api.github.com/users/regisncoelho/following')
       .then(function (respostaDoServidor) {
         return respostaDoServidor.json()
       })
       .then(function (respostaConvertida) {
         setFollowing(respostaConvertida);
+      })
+
+      following.map((itemAtual) => {
+        fetch(`https://api.github.com/users/${itemAtual.login}`)
+          .then(response => response.json())
+          .then(data => setUsersFollowing(data));
       })
 
     fetch('https://graphql.datocms.com/', {
@@ -70,7 +68,6 @@ export default function Home() {
         setComunidades(dataReceivedFromDato)
       })
   }, [])
-
   return (
     <>
       <AlurakutMenu />
