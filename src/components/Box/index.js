@@ -3,7 +3,7 @@ import styled from 'styled-components'
 const Box = styled.div`
   background: #ffffff;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: auto;
   padding: 16px;
   
   /* CSS Pré-Pronto */
@@ -37,7 +37,7 @@ const Box = styled.div`
     border-color: transparent;
     border-bottom-color: #ECF2FA;
   }
-  input {
+  input, textarea {
     width: 100%;
     background-color: #F4F4F4;
     color: #333333;
@@ -45,6 +45,7 @@ const Box = styled.div`
     padding: 14px 16px;
     margin-bottom: 14px;
     border-radius: 10000px;
+    font-family: inherit;
     ::placeholder {
       color: #333333;
       opacity: 1;
@@ -57,7 +58,9 @@ const Box = styled.div`
     border-radius: 10000px;
     background-color: #6F92BB;
   }
-
+  .profile:nth-child(odd) {
+    background-color: #DEEEFE;
+  }
 `;
 
 export default Box;
