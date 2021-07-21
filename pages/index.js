@@ -1,19 +1,30 @@
 import React from 'react'
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons'
 import { ProfileRelationsBoxWrapper } from '../src/components/profileRelations'
 
 
-function ProfileSideBar(propriedades) {
-  const githubUser = `regisncoelho`;
+function ProfileSideBar(props) {
+  const [dadosUsuario, setDadosUsuario] = React.useState([]);
+  React.useEffect(function () {
+    fetch(`https://api.github.com/users/${props.githubUser}`)
+      .then(function (respostaDoServidor) {
+        return respostaDoServidor.json()
+      })
+      .then(function (respostaConvertida) {
+        setDadosUsuario(respostaConvertida);
+      })
+  }, [])
   return (
     <Box as="aside">
-      <img src={`https://github.com/${propriedades.githubUser}.png`} style={{ borderRadius: '8px' }}></img>
+      <img src={dadosUsuario.avatar_url} style={{ borderRadius: '8px' }}></img>
       <hr />
       <p>
-        <a className="boxLink" href={`https://github.com/${propriedades.githubUser}`}>
-          Régis Coelho
+        <a className="boxLink" href={dadosUsuario.html_url}>
+          {dadosUsuario.name}
         </a>
       </p>
       <hr />
@@ -22,8 +33,9 @@ function ProfileSideBar(propriedades) {
   )
 }
 
-export default function Home() {
+export default function Home(props) {
   const profile = [
+
     {
       title: "relacionamento",
       content: "casado"
@@ -56,19 +68,28 @@ export default function Home() {
       title: "github",
       content: "@regisncoelho"
     }]
-  const githubUser = `regisncoelho`;
+  const githubUser = props.githubUser
+  const [dadosUsuario, setDadosUsuario] = React.useState([]);
   const [comunidades, setComunidades] = React.useState([]);
   const [depoimentos, setDepoimentos] = React.useState([]);
   const [following, setFollowing] = React.useState([])
   // const [usersfollowing, setUsersFollowing] = React.useState([])
 
   React.useEffect(function () {
-    fetch(`https://api.github.com/users/${githubUser}/following`)
+    fetch(`https://api.github.com/users/${props.githubUser}/following`)
       .then(function (respostaDoServidor) {
         return respostaDoServidor.json()
       })
       .then(function (respostaConvertida) {
         setFollowing(respostaConvertida);
+      })
+
+    fetch(`https://api.github.com/users/${props.githubUser}`)
+      .then(function (respostaDoServidor) {
+        return respostaDoServidor.json()
+      })
+      .then(function (respostaConvertida) {
+        setDadosUsuario(respostaConvertida);
       })
 
     //   following.map((itemAtual) => {
@@ -115,6 +136,7 @@ export default function Home() {
         "query": `query {
             allTestimonials {
               id
+              name
               username
               message
               createdAt
@@ -131,7 +153,7 @@ export default function Home() {
 
   return (
     <>
-      <AlurakutMenu />
+      <AlurakutMenu githubUser={githubUser} />
       <MainGrid>
         <div className="profileArea" style={{ gridAreas: 'profileArea' }}>
           <ProfileSideBar githubUser={githubUser} />
@@ -140,7 +162,7 @@ export default function Home() {
         <div className="welcomeArea" style={{ gridAreas: 'welcomeArea' }}>
           <Box>
             <h1 className="title">
-              Bem vindo(a)
+              Bem vindo(a), {dadosUsuario.name}
             </h1>
             <OrkutNostalgicIconSet />
           </Box>
@@ -152,12 +174,12 @@ export default function Home() {
                     about me
                   </p>
                 </div>
-                <div style={{ color: '#333', width: '75%', paddingBottom: '5px', paddingTop: '5px', paddingRight: '5px', textAlign: 'justify' }}>
-                  <p>
+                <div style={{ color: '#333', width: '75%', paddingBottom: '5px', paddingTop: '5px', paddingRight: '15px', textAlign: 'justify' }}>
+                  <p style={{textIndent: '1ch', lineHeight: '1.5', marginBottom: '0.5em'}}>
                     Sou economista por formação acadêmica e ambientalista por vocação. Atuo atualmente como servidor público estadual e após a última imersão_dev embarquei de volta no mundo da tecnologia, após entreter por anos a ideia de aprender a programar e, quem sabe, mudar de carreira.
                   </p>
-                  <p>
-                    Meu primeiro e último contato com esse mundo havia sido há 18 anos, quando fiz um curso de Webmaster Design . Foi uma grata surpresa descobrir que ainda me lembrava de muita coisa de HTML e um desafio estimulante voltar a pensar e ler de forma codificada
+                  <p style={{textIndent: '1ch', lineHeight: '1.5'}}>
+                    Meu primeiro e último contato com esse mundo havia sido há 18 anos, quando fiz um curso de Webmaster Design. Foi uma grata surpresa descobrir que ainda me lembrava de muita coisa de HTML e um desafio estimulante voltar a pensar e ler de forma codificada
                   </p>
                 </div>
               </div>
@@ -184,23 +206,37 @@ export default function Home() {
               Depoimentos ({depoimentos.length})
             </h2>
             {depoimentos.map((depoAtual) => {
+              const created = new Date(`${depoAtual.createdAt}`)
+              const dataCriadoEm = created.toLocaleDateString('pt-BR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })
+              const horaCriadoEm = created.toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+              console.log(typeof (dataCriadoEm))
               return (
-                <article key={depoAtual.id} style={{ margin: '20px', background: '#F4F4F4', borderRadius: '10000px' }}>
-                  <div style={{ display: 'flex', position: 'relative' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', width: '20%' }}>
-                      <img src={`http://github.com/${depoAtual.username}.png`} style={{ height: '90px', width: '90px', borderRadius: '100%' }} />
-                    </div>
-                    <div style={{ display: 'flex', width: '80%', flexDirection: 'column', alignItens: 'flex-start' }}>
-                      {/* <div> */}
-                      <a href="" key={depoAtual.id} target="_blank" style={{ textDecoration: 'none' }}>
-                        <h4>{depoAtual.username}</h4>
-                      </a>
-                      {/* </div> */}
-                      <p style={{ margin: '10px', paddingRight: '30px', textAlign: 'justify' }}>
-                        {depoAtual.message}
-                      </p>
+                <article className="" key={depoAtual.id} style={{ margin: '20px' }}>
+                  <div className="testimonialBox" style={{ borderRadius: '10000px' }}>
+                    <div style={{ display: 'flex', position: 'relative' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', width: '20%' }}>
+                        <img src={`http://github.com/${depoAtual.username}.png`} style={{ height: '90px', width: '90px', borderRadius: '100%' }} />
+                      </div>
+                      <div style={{ display: 'flex', width: '80%', flexDirection: 'column', alignItens: 'flex-start' }}>
+                        <a href={`http://github.com/${depoAtual.username}`} key={depoAtual.id} target="_blank" style={{ color: '#333', textDecoration: 'none' }}>
+                          <h4 style={{color: '#2E7BB4'}}>{depoAtual.name} ({depoAtual.username})</h4>
+                        </a>
+                        <p style={{ margin: '10px', paddingRight: '30px', textAlign: 'justify' }}>
+                          {depoAtual.message}
+                        </p>
+                      </div>
                     </div>
                   </div>
+                  <p style={{ marginLeft: '60px' }}>
+                    <small style={{color: '#555'}}>Postado em: {dataCriadoEm} - {horaCriadoEm}</small>
+                  </p>
                 </article>
               )
             })}
@@ -212,7 +248,8 @@ export default function Home() {
               const dadosDoFormDepoimento = new FormData(e.target);
               const depoimento = {
                 itemType: "977468",
-                username: dadosDoFormDepoimento.get('username'),
+                name: `${dadosUsuario.name}`,
+                username: `${githubUser}`,
                 message: dadosDoFormDepoimento.get('message'),
               }
 
@@ -225,19 +262,18 @@ export default function Home() {
               })
                 .then(async (response) => {
                   const dados = await response.json();
-                  console.log(dados.registroCriado);
                   const depoimento = dados.registroCriado;
                   const depoimentosAtualizados = [...depoimentos, depoimento];
                   setDepoimentos(depoimentosAtualizados)
                 })
             }} autoComplete="off">
               <div>
-                <input
+                {/* <input
                   placeholder="Qual seu nome?"
                   name="username"
                   aria-label="Qual seu nome?"
                   type="text"
-                />
+                /> */}
               </div>
               <div>
                 <textarea
@@ -311,7 +347,6 @@ export default function Home() {
               })
                 .then(async (response) => {
                   const dados = await response.json();
-                  console.log(dados.registroCriado);
                   const comunidade = dados.registroCriado;
                   const comunidadesAtualizadas = [...comunidades, comunidade];
                   setComunidades(comunidadesAtualizadas)
@@ -343,4 +378,43 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+export async function getServerSideProps(context) {
+  const cookie = nookies.get(context)
+  const token = cookie.USER_TOKEN
+
+  const { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+      Authorization: token
+    }
+  })
+    .then((resposta) => resposta.json())
+
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+  // const githubUser = decoded?.githubUser;
+
+  // console.log(githubUser)
+
+  // if (!githubUser) {
+  //   return {
+  //     redirect: {
+  //       destination: '/login',
+  //       permanent: false,
+  //     },
+  //   }
+  // }
+  const { githubUser } = jwt.decode(token)
+
+  return {
+    props: {
+      githubUser
+    }, // will be passed to the page component as props
+  }
 }

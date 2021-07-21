@@ -1,6 +1,8 @@
 import React from 'react';
+import nookies from 'nookies';
 import styled, { css } from 'styled-components';
 import NextLink from 'next/link';
+import { useRouter } from 'next/dist/client/router';
 
 const BASE_URL = 'http://alurakut.vercel.app/';
 const v = '1';
@@ -20,7 +22,7 @@ function Link({ href, children, ...props }) {
 // Menu
 // ================================================================================================================
 export function AlurakutMenu({ githubUser }) {
-  var githubUser = `regisncoelho`;
+  const router = useRouter()
   const [isMenuOpen, setMenuState] = React.useState(false);
   return (
     <AlurakutMenu.Wrapper isMenuOpen={isMenuOpen}>
@@ -36,7 +38,12 @@ export function AlurakutMenu({ githubUser }) {
         </nav>
 
         <nav>
-          <a href={`/logout`}>
+          <a href={`/logout`} onClick={(e) => {
+            e.preventDefault();
+            nookies.destroy(null, 'USER_TOKEN')
+            router.push('/')
+          }}
+            >
             Sair
           </a>
           <div>
@@ -164,14 +171,24 @@ AlurakutMenu.Logo = styled.img`
 `;
 
 function AlurakutMenuProfileSidebar({ githubUser }) {
-  return (
+  const [dadosUsuario, setDadosUsuario] = React.useState([]);
+  React.useEffect(function () {
+    fetch(`https://api.github.com/users/${githubUser}`)
+    .then(function (respostaDoServidor) {
+      return respostaDoServidor.json()
+    })
+    .then(function (respostaConvertida) {
+      setDadosUsuario(respostaConvertida);
+    })
+  }, [])
+  return (  
     <div className="alurakutMenuProfileSidebar">
       <div>
         <img src={`https://github.com/${githubUser}.png`} style={{ borderRadius: '8px' }} />
         <hr />
         <p>
-          <a className="boxLink" href={`/user/${githubUser}`}>
-            @{githubUser}
+          <a className="boxLink" href={`https://github.com/${githubUser}`}>
+            {dadosUsuario.name}
           </a>
         </p>
         <hr />
@@ -186,6 +203,7 @@ function AlurakutMenuProfileSidebar({ githubUser }) {
 // AlurakutProfileSidebarMenuDefault
 // ================================================================================================================
 export function AlurakutProfileSidebarMenuDefault() {
+  const router = useRouter()
   return (
     <AlurakutProfileSidebarMenuDefault.Wrapper>
       <nav>
@@ -212,7 +230,11 @@ export function AlurakutProfileSidebarMenuDefault() {
           <img src={`${BASE_URL}/icons/plus.svg`} />
             GitHub Trends
           </a>
-        <a href="/logout">
+        <a href="/logout" onClick={(e) => {
+            e.preventDefault();
+            nookies.destroy(null, 'USER_TOKEN')
+            router.push('/')
+          }}>
           <img src={`${BASE_URL}//icons/logout.svg`} />
             Sair
           </a>
@@ -498,4 +520,4 @@ export const AlurakutStyles = css`
     }
   }
   ${AlurakutLoginScreen}
-`; 
+`;

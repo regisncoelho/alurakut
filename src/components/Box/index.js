@@ -58,7 +58,7 @@ const Box = styled.div`
     border-radius: 10000px;
     background-color: #6F92BB;
   }
-  .profile:nth-child(odd) {
+  .profile:nth-child(odd), .testimonialBox {
     background-color: #DEEEFE;
   }
 `;

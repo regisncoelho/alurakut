@@ -1,6 +1,12 @@
 import React from 'react';
+import nookies from 'nookies';
+//hook do Next.js
+import { useRouter } from 'next/dist/client/router';
 
 export default function LoginScreen() {
+  const router = useRouter();
+  const [githubUser, setGithubUser] = React.useState('');
+
   return (
     <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <div className="loginScreen">
@@ -13,11 +19,40 @@ export default function LoginScreen() {
         </section>
 
         <section className="formArea">
-          <form className="box">
+          <form className="box" onSubmit={(infosDoEvento) => {
+            infosDoEvento.preventDefault();
+            console.log('Nome do usuário', githubUser)
+
+            fetch('https://alurakut.vercel.app/api/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                githubUser: githubUser
+              })
+            })
+              .then(async (respostaDoServer) => {
+                const dadosDaResposta = await respostaDoServer.json()
+                const token = dadosDaResposta.token;
+                nookies.set(null, 'USER_TOKEN', token, {
+                    path: '/',
+                    maxAge: 43200
+                  })
+                router.push('/')
+              })
+
+          }}>
             <p>
               Acesse agora mesmo com seu usuário do <strong>GitHub</strong>!
-          </p>
-            <input placeholder="Usuário" value={githubUser}/>
+            </p>
+            <input
+              placeholder="Usuário"
+              value={githubUser}
+              onChange={(evento) => {
+                setGithubUser(evento.target.value)
+              }}
+            />
             <button type="submit">
               Login
             </button>
@@ -29,7 +64,7 @@ export default function LoginScreen() {
               <a href="/login">
                 <strong>
                   ENTRAR JÁ
-              </strong>
+                </strong>
               </a>
             </p>
           </footer>
@@ -43,4 +78,4 @@ export default function LoginScreen() {
       </div>
     </main>
   )
-} 
+}
